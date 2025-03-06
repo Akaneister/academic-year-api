@@ -61,6 +61,18 @@ public class DatabaseService {
         String query = "SELECT * FROM Formation WHERE id = ?";
         return jdbcTemplate.queryForObject(query, new Object[]{id}, new BeanPropertyRowMapper<>(Formation.class));
     }
+
+    public void updateFormation(int id, Formation formation) {
+        String query = "UPDATE Formation SET TailleTP = ?, TailleTD = ?, nom = ?, nbUeOption = ?, annee_academique = ? WHERE id = ?";
+        jdbcTemplate.update(query, 
+            formation.getTailleTP(), 
+            formation.getTailleTD(),  
+            formation.getNom(), 
+            formation.getNombreOption(),  
+            formation.getAnneeAcademique(),
+            id);  
+    }
+    
 }
 
 

@@ -14,6 +14,7 @@ public class Formation {
     private String nom;
     private int nombreOption;
     private String annee_Academic;
+    private int id;
 
    
 
@@ -30,6 +31,10 @@ public class Formation {
         return tailleTP;
     }
 
+    public int getId() {
+        return id;
+    }
+    
     public void setTailleTP(int tailleTP) {
         this.tailleTP = tailleTP;
     }

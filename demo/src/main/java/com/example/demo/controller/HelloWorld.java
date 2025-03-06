@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -87,6 +88,27 @@ public class HelloWorld {
     
         return response;
     }
+
+
+    @PutMapping("/annees-academiques/{id}")
+    public Map<String, Object> updateFormation(@PathVariable("id") int id, @RequestBody Formation formation) {
+        Map<String, Object> response = new HashMap<>();
+
+        // Vérifier si la formation existe déjà
+        Formation existingFormation = databaseService.getFormationById(id);
+
+        if (existingFormation != null) {
+            // Si la formation existe, mettre à jour les informations
+            databaseService.updateFormation(id, formation);
+            response.put("message", "Formation updated successfully");
+            response.put("formation", formation);
+        } else {
+            response.put("message", "Formation not found");
+        }
+
+        return response;
+    }
+
 
 
 

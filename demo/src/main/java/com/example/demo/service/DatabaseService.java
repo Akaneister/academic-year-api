@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.entities.Etudiant;
 import com.example.demo.entities.Formation;
 
 @Service
@@ -71,6 +72,34 @@ public class DatabaseService {
             formation.getNombreOption(),  
             formation.getAnneeAcademique(),
             id);  
+    }
+
+
+    public void deleteFormation(Long id) {
+        String query = "DELETE FROM Formation WHERE id = ?";
+        jdbcTemplate.update(query, id);
+    }
+    
+
+
+    public void getEtudiantFormation(Long id) {
+        String query = "SELECT * FROM Formation WHERE id = ?";
+        jdbcTemplate.queryForObject(query, new Object[]{id}, new BeanPropertyRowMapper<>(Formation.class));
+    }
+
+    public List<Etudiant> getEtudiantsByFormationId(int formationId) {
+        String query = "SELECT * FROM Etudiant WHERE id = ?";
+    
+        // Utilisation d'un RowMapper pour mapper les résultats à des objets Etudiant
+        return jdbcTemplate.query(query, new Object[]{formationId}, (rs, rowNum) -> {
+            Etudiant etudiant = new Etudiant();
+            etudiant.setId(rs.getInt("id"));
+            etudiant.setNumeroEtudiant(rs.getString("numeroEtu"));
+            etudiant.setValidation(rs.getInt("validation"));
+            etudiant.setNom(rs.getString("nom"));
+            etudiant.setPrenom(rs.getString("prenom"));
+            return etudiant;
+        });
     }
     
 }

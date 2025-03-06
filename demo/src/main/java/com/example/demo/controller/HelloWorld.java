@@ -1,10 +1,12 @@
 package com.example.demo.controller;
 
+import com.example.demo.entities.Etudiant;
 import com.example.demo.entities.Formation;
 import com.example.demo.service.DatabaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -109,6 +111,32 @@ public class HelloWorld {
         return response;
     }
 
+
+    @DeleteMapping("/annees-academiques/{id}")
+    public ResponseEntity<Void> deleteFormation(@PathVariable("id") Long id) {
+        databaseService.deleteFormation(id);
+        return ResponseEntity.noContent().build(); 
+    }
+
+    @GetMapping("/annees-academiques/{id}/etudiants")
+    public Map<String, Object> getEtudiantsFormation(@PathVariable("id") int id) {
+        logger.info("Request to get students for formation with ID: {}", id);  // Log de la requête reçue
+        
+        // Récupération des étudiants pour la formation donnée
+        List<Etudiant> etudiants = databaseService.getEtudiantsByFormationId(id);
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        if (!etudiants.isEmpty()) {
+            logger.info("Found {} students for formation with ID: {}", etudiants.size(), id); // Log du nombre d'étudiants trouvés
+            response.put("etudiants", etudiants);
+        } else {
+            logger.warn("No students found for formation with ID: {}", id); // Log si aucun étudiant n'est trouvé
+            response.put("message", "Aucun étudiant trouvé pour cette formation");
+        }
+        
+        return response;
+    }
 
 
 

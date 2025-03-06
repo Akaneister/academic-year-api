@@ -1,0 +1,471 @@
+openapi: 3.0.0
+info:
+  title: API de Gestion de Formation
+  description: API permettant de gérer les formations, les étudiants, les groupes et les unités d'enseignement (UE)
+  version: 1.0.0
+
+paths:
+  /:
+    get:
+      summary: "Hello World"
+      description: "Retourne un message de bienvenue"
+      responses:
+        '200':
+          description: "Message de bienvenue"
+
+  /db-status:
+    get:
+      summary: "Vérification de la connexion à la base de données"
+      description: "Vérifie si la connexion à MySQL est réussie"
+      responses:
+        '200':
+          description: "Statut de la connexion à la base de données"
+
+  /annees-academiques:
+    get:
+      summary: "Récupérer toutes les années académiques"
+      description: "Retourne une liste paginée des années académiques"
+      parameters:
+        - name: page
+          in: query
+          description: "Page de résultats"
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limite
+          in: query
+          description: "Nombre maximum de résultats par page"
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: "Liste des années académiques"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  annees:
+                    type: array
+                    items:
+                      type: string
+                  total:
+                    type: integer
+                  pages:
+                    type: integer
+
+    post:
+      summary: "Ajouter une formation"
+      description: "Ajoute une nouvelle formation à la base de données"
+      requestBody:
+        description: "Formation à ajouter"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                tailleTP:
+                  type: integer
+                tailleTD:
+                  type: integer
+                nbUeOption:
+                  type: integer
+                anneeAcademique:
+                  type: string
+      responses:
+        '201':
+          description: "Formation ajoutée avec succès"
+        '500':
+          description: "Erreur interne du serveur"
+
+  /annees-academiques/{id}:
+    get:
+      summary: "Récupérer une formation par ID"
+      description: "Retourne les détails d'une formation en fonction de son ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID de la formation"
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "Détails de la formation"
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: "Formation non trouvée"
+
+    put:
+      summary: "Mettre à jour une formation"
+      description: "Met à jour les détails d'une formation par son ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID de la formation"
+          schema:
+            type: integer
+      requestBody:
+        description: "Détails de la formation à mettre à jour"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                tailleTP:
+                  type: integer
+                tailleTD:
+                  type: integer
+                nbUeOption:
+                  type: integer
+                anneeAcademique:
+                  type: string
+      responses:
+        '200':
+          description: "Formation mise à jour avec succès"
+        '400':
+          description: "Données invalides"
+        '404':
+          description: "Formation non trouvée"
+
+    delete:
+      summary: "Supprimer une formation"
+      description: "Supprime une formation par son ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID de la formation"
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "Formation supprimée avec succès"
+        '404':
+          description: "Formation non trouvée"
+
+  /annees-academiques/{id}/etudiants:
+    get:
+      summary: "Récupérer les étudiants par formation"
+      description: "Retourne la liste des étudiants inscrits dans une formation par son ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID de la formation"
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "Liste des étudiants"
+        '404':
+          description: "Aucun étudiant trouvé pour cette formation"
+
+  /annees-academiques/{id}/groupes:
+    get:
+      summary: "Récupérer les groupes par formation"
+      description: "Retourne les groupes associés à une formation"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID de la formation"
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "Liste des groupes"
+        '404':
+          description: "Aucun groupe trouvé pour cette formation"
+
+  /annees-academiques/{id}/ues:
+    get:
+      summary: "Récupérer les UEs par formation"
+      description: "Retourne la liste des unités d'enseignement associées à une formation"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID de la formation"
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "Liste des UEs"
+        '404':
+          description: "Aucune UE trouvée pour cette formation"
+
+  /annees-academiques/{nomFormation}/inscrire/{numeroEtudiant}:
+    post:
+      summary: "Inscrire un étudiant à une formation"
+      description: "Inscrit un étudiant dans une formation par son numéro d'étudiant"
+      parameters:
+        - name: nomFormation
+          in: path
+          required: true
+          description: "Nom de la formation"
+          schema:
+            type: string
+        - name: numeroEtudiant
+          in: path
+          required: true
+          description: "Numéro de l'étudiant"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Étudiant inscrit avec succès"
+        '500':
+          description: "Erreur interne lors de l'inscription"
+
+  /annees-academiques/acceptation/{numeroEtudiant}:
+    put:
+      summary: "Valider l'inscription d'un étudiant"
+      description: "Valide l'inscription d'un étudiant par son numéro d'étudiant"
+      parameters:
+        - name: numeroEtudiant
+          in: path
+          required: true
+          description: "Numéro de l'étudiant"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Étudiant validé avec succès"
+        '404':
+          description: "Étudiant non trouvé"
+
+  /annees-academiques/desinscription/{numeroEtudiant}:
+    delete:
+      summary: "Désinscrire un étudiant"
+      description: "Désinscrit un étudiant d'une formation par son numéro d'étudiant"
+      parameters:
+        - name: numeroEtudiant
+          in: path
+          required: true
+          description: "Numéro de l'étudiant"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Étudiant désinscrit avec succès"
+        '404':
+          description: "Étudiant non trouvé"
+
+  /groupes:
+    get:
+      summary: "Récupérer tous les groupes"
+      description: "Retourne la liste de tous les groupes"
+      responses:
+        '200':
+          description: "Liste des groupes"
+
+    post:
+      summary: "Créer un groupe"
+      description: "Crée un nouveau groupe"
+      requestBody:
+        description: "Détails du groupe à créer"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                type:
+                  type: string
+      responses:
+        '201':
+          description: "Groupe créé avec succès"
+        '400':
+          description: "Données invalides"
+        '500':
+          description: "Erreur interne lors de la création du groupe"
+
+  /groupes/{id}:
+    get:
+      summary: "Récupérer un groupe par ID"
+      description: "Retourne les détails d'un groupe en fonction de son ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID du groupe"
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "Détails du groupe"
+        '404':
+          description: "Groupe non trouvé"
+
+    put:
+      summary: "Mettre à jour un groupe"
+      description: "Met à jour les détails d'un groupe par son ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID du groupe"
+          schema:
+            type: integer
+      requestBody:
+        description: "Détails du groupe à mettre à jour"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                type:
+                  type: string
+      responses:
+        '200':
+          description: "Groupe mis à jour avec succès"
+        '400':
+          description: "Données invalides"
+        '404':
+          description: "Groupe non trouvé"
+
+    delete:
+      summary: "Supprimer un groupe"
+      description: "Supprime un groupe par son ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID du groupe"
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "Groupe supprimé avec succès"
+        '404':
+          description: "Groupe non trouvé"
+
+  /ue:
+    get:
+      summary: "Récupérer toutes les UEs"
+      description: "Retourne la liste de toutes les unités d'enseignement"
+      responses:
+        '200':
+          description: "Liste des UEs"
+
+    post:
+      summary: "Créer une UE"
+      description: "Crée une nouvelle unité d'enseignement"
+      requestBody:
+        description: "Détails de l'UE à créer"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                capacite:
+                  type: integer
+      responses:
+        '201':
+          description: "UE créée avec succès"
+        '400':
+          description: "Données invalides"
+        '500':
+          description: "Erreur interne lors de la création de l'UE"
+
+  /ue/{id}:
+    get:
+      summary: "Récupérer une UE par ID"
+      description: "Retourne les détails d'une UE en fonction de son ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID de l'UE"
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "Détails de l'UE"
+        '404':
+          description: "UE non trouvée"
+
+    put:
+      summary: "Mettre à jour une UE"
+      description: "Met à jour les détails d'une UE par son ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID de l'UE"
+          schema:
+            type: integer
+      requestBody:
+        description: "Détails de l'UE à mettre à jour"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                capacite:
+                  type: integer
+      responses:
+        '200':
+          description: "UE mise à jour avec succès"
+        '400':
+          description: "Données invalides"
+        '404':
+          description: "UE non trouvée"
+
+    delete:
+      summary: "Supprimer une UE"
+      description: "Supprime une UE par son ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID de l'UE"
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "UE supprimée avec succès"
+        '404':
+          description: "UE non trouvée"
+
+  /ue/{id}/inscrire/{numeroEtudiant}:
+    post:
+      summary: "Inscrire un étudiant à une UE"
+      description: "Inscrit un étudiant à une unité d'enseignement (UE)"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID de l'UE"
+          schema:
+            type: integer
+        - name: numeroEtudiant
+          in: path
+          required: true
+          description: "Numéro de l'étudiant"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Étudiant inscrit avec succès"
+        '500':
+          description: "Erreur interne lors de l'inscription"

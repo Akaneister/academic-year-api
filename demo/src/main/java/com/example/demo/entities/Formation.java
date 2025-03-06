@@ -12,6 +12,15 @@ public class Formation {
     private int tailleTP;
     private String nom;
     private int nombreOption;
+    private int annee_Academic;
+
+    public int getAnnee_Academic() {
+        return annee_Academic;
+    }
+
+    public void setAnnee_Academic(int annee_Academic) {
+        this.annee_Academic = annee_Academic;
+    }
     private List<String> groupes;
     private List<Ue> ues;
 
@@ -75,4 +84,5 @@ public class Formation {
             throw new IllegalArgumentException("The number of UEs cannot exceed the number of options.");
         }
     }
+    
 }

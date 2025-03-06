@@ -29,12 +29,9 @@ public class Etudiant {
         this.nom = nom;
     }
 
-    public void setValidation(int validation) {
-        if (validation == 1) {
-            this.validation = true;
-        } else {
-            this.validation = false;
-        }
+
+    public boolean getValidation() {
+        return validation;
     }
     
 

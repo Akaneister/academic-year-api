@@ -26,6 +26,8 @@ public class DatabaseService {
         }
     }
 
+
+    //ACADEMIC YEARS __________________________________________________________
     public int getTotalAcademicYears() {
         String sql = "SELECT COUNT(DISTINCT annee_academique) FROM Formation";
         
@@ -48,60 +50,16 @@ public class DatabaseService {
         return count > 0;
     }
 
-    public void addFormation(Formation formation) {
-        String query = "INSERT INTO Formation (TailleTP, TailleTD, nom, nbUeOption, annee_academique) VALUES (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(query, 
-            formation.getTailleTP(), 
-            formation.getTailleTD(),  
-            formation.getNom(), 
-            formation.getNombreOption(),  
-            formation.getAnneeAcademique());
+    public void addFormation(String nom, int tailleTP, int tailleTD, int nbUeOption, String anneeAcademique) {
+        // SQL pour insérer une nouvelle formation
+        String sql = "INSERT INTO Formation (nom, TailleTP, TailleTD, nbUeOption, annee_academique) VALUES (?, ?, ?, ?, ?)";
+
+        // Mise à jour de la base de données
+        jdbcTemplate.update(sql, nom, tailleTP, tailleTD, nbUeOption, anneeAcademique);
     }
+
     
-    public Formation getFormationById(int id) {
-        String query = "SELECT * FROM Formation WHERE id = ?";
-        return jdbcTemplate.queryForObject(query, new Object[]{id}, new BeanPropertyRowMapper<>(Formation.class));
-    }
-
-    public void updateFormation(int id, Formation formation) {
-        String query = "UPDATE Formation SET TailleTP = ?, TailleTD = ?, nom = ?, nbUeOption = ?, annee_academique = ? WHERE id = ?";
-        jdbcTemplate.update(query, 
-            formation.getTailleTP(), 
-            formation.getTailleTD(),  
-            formation.getNom(), 
-            formation.getNombreOption(),  
-            formation.getAnneeAcademique(),
-            id);  
-    }
-
-
-    public void deleteFormation(Long id) {
-        String query = "DELETE FROM Formation WHERE id = ?";
-        jdbcTemplate.update(query, id);
-    }
-    
-
-
-    public void getEtudiantFormation(Long id) {
-        String query = "SELECT * FROM Formation WHERE id = ?";
-        jdbcTemplate.queryForObject(query, new Object[]{id}, new BeanPropertyRowMapper<>(Formation.class));
-    }
-
-    public List<Etudiant> getEtudiantsByFormationId(int formationId) {
-        String query = "SELECT * FROM Etudiant WHERE id = ?";
-    
-        // Utilisation d'un RowMapper pour mapper les résultats à des objets Etudiant
-        return jdbcTemplate.query(query, new Object[]{formationId}, (rs, rowNum) -> {
-            Etudiant etudiant = new Etudiant();
-            etudiant.setId(rs.getInt("id"));
-            etudiant.setNumeroEtudiant(rs.getString("numeroEtu"));
-            etudiant.setValidation(rs.getInt("validation"));
-            etudiant.setNom(rs.getString("nom"));
-            etudiant.setPrenom(rs.getString("prenom"));
-            return etudiant;
-        });
-    }
-    
+    //__________________________________________________________________________
 }
 
 

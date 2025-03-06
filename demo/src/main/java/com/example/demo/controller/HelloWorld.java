@@ -39,13 +39,22 @@ public class HelloWorld {
 
     @GetMapping("/db-status")
     public String checkDatabaseConnection() {
-        if (databaseService.isDatabaseConnected()) {
-            return "✅ Connected to MySQL!";
-        } else {
+        try {
+            boolean isConnected = databaseService.isDatabaseConnected();
+            if (isConnected) {
+                logger.info("✅ Successfully connected to MySQL!"); // Log d'information pour une connexion réussie
+                return "✅ Connected to MySQL!";
+            } else {
+                logger.error("❌ Error: Could not connect to MySQL!"); // Log d'erreur si la connexion échoue
+                return "❌ Error: Could not connect to MySQL!";
+            }
+        } catch (Exception e) {
+            // Log d'erreur détaillé si une exception est levée
+            logger.error("Error occurred while checking MySQL connection", e);
             return "❌ Error: Could not connect to MySQL!";
         }
     }
-
+    
     @GetMapping("/annees-academiques")
     public Map<String, Object> getAcademicYears(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int limite) {
         List<String> annees = databaseService.getAcademicYears(page, limite);
@@ -64,85 +73,40 @@ public class HelloWorld {
 
     @PostMapping("/annees-academiques")
     public ResponseEntity<String> addFormation(@RequestBody Formation formation) {
-        try {
-            // Tentative d'ajout de la formation dans la base de données
-            databaseService.addFormation(formation);
-            logger.info("Formation added successfully: {}", formation.getNom()); // Log d'information
-            return new ResponseEntity<>("Formation added successfully!", HttpStatus.CREATED);
-        } catch (Exception e) {
-            // Log d'erreur si l'ajout échoue
-            logger.error("Failed to add formation: {}", formation.getNom(), e);
-            return new ResponseEntity<>("Failed to add formation.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    try {
+        // Tentative d'ajout de la formation dans la base de données
+        databaseService.addFormation(
+            formation.getNom(),
+            formation.getTailleTP(),
+            formation.getTailleTD(),
+            formation.getNombreOption(),
+            formation.getAnneeAcademique()
+        );
+
+        logger.info("Formation added successfully: {}", formation.getNom()); // Log d'information
+        return new ResponseEntity<>("Formation added successfully!", HttpStatus.CREATED);
+
+    } catch (Exception e) {
+        // Log d'erreur plus détaillé avec l'exception et les détails de la formation
+        logger.error("Failed to add formation: {}. Error: {}", 
+            formation != null ? formation.getNom() : "null", 
+            e.getMessage(), 
+            e
+        );
+
+        return new ResponseEntity<>("Failed to add formation. Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+}
 
 
-    @GetMapping("annees-academiques/{id}")
-    public Map<String, Object> getFormationById(@PathVariable("id") int id) {
-        Formation formation = databaseService.getFormationById(id);
+
+
+}
+
     
-        Map<String, Object> response = new HashMap<>();
-        if (formation != null) {
-            response.put("formation", formation);
-        } else {
-            response.put("message", "Formation not found");
-        }
-    
-        return response;
-    }
-
-
-    @PutMapping("/annees-academiques/{id}")
-    public Map<String, Object> updateFormation(@PathVariable("id") int id, @RequestBody Formation formation) {
-        Map<String, Object> response = new HashMap<>();
-
-        // Vérifier si la formation existe déjà
-        Formation existingFormation = databaseService.getFormationById(id);
-
-        if (existingFormation != null) {
-            // Si la formation existe, mettre à jour les informations
-            databaseService.updateFormation(id, formation);
-            response.put("message", "Formation updated successfully");
-            response.put("formation", formation);
-        } else {
-            response.put("message", "Formation not found");
-        }
-
-        return response;
-    }
-
-
-    @DeleteMapping("/annees-academiques/{id}")
-    public ResponseEntity<Void> deleteFormation(@PathVariable("id") Long id) {
-        databaseService.deleteFormation(id);
-        return ResponseEntity.noContent().build(); 
-    }
-
-    @GetMapping("/annees-academiques/{id}/etudiants")
-    public Map<String, Object> getEtudiantsFormation(@PathVariable("id") int id) {
-        logger.info("Request to get students for formation with ID: {}", id);  // Log de la requête reçue
-        
-        // Récupération des étudiants pour la formation donnée
-        List<Etudiant> etudiants = databaseService.getEtudiantsByFormationId(id);
-        
-        Map<String, Object> response = new HashMap<>();
-        
-        if (!etudiants.isEmpty()) {
-            logger.info("Found {} students for formation with ID: {}", etudiants.size(), id); // Log du nombre d'étudiants trouvés
-            response.put("etudiants", etudiants);
-        } else {
-            logger.warn("No students found for formation with ID: {}", id); // Log si aucun étudiant n'est trouvé
-            response.put("message", "Aucun étudiant trouvé pour cette formation");
-        }
-        
-        return response;
-    }
-
-
-
    
     
 
 
     
-}
+

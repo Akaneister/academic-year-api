@@ -95,8 +95,42 @@ public class HelloWorld {
         );
 
         return new ResponseEntity<>("Failed to add formation. Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/annees-academiques/{id}")
+    public ResponseEntity<Formation> getFormationById(@PathVariable Long id) {
+        try {
+            Formation formation = databaseService.getFormationById(id);
+            if (formation != null) {
+                return new ResponseEntity<>(formation, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            logger.error("Error retrieving formation with ID {}: {}", id, e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/annees-academiques/{id}")
+    public ResponseEntity<String> updateFormation(@PathVariable Long id, @RequestBody Formation formation) {
+    try {
+        boolean updated = databaseService.updateFormation(id, formation);
+        if (updated) {
+            logger.info("Formation with ID {} updated successfully", id);
+            return new ResponseEntity<>("Formation updated successfully!", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Formation not found.", HttpStatus.NOT_FOUND);
+        }
+    } catch (Exception e) {
+        logger.error("Failed to update formation with ID {}: {}", id, e.getMessage());
+        return new ResponseEntity<>("Failed to update formation.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
+
+
+    
 
 
 

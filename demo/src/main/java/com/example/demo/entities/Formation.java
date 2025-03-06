@@ -12,13 +12,9 @@ public class Formation {
     private int tailleTP;
     private int tailleTD;
     private String nom;
-    private int nombreOption;
+    private int nbUeOption;
     private String annee_Academic;
-    private int id;
-
-   
-
-  
+    private int id;  
     private List<String> groupes;
     private List<Ue> ues;
 
@@ -55,12 +51,12 @@ public class Formation {
         this.nom = nom;
     }
 
-    public int getNombreOption() {
-        return nombreOption;
+    public int getnbUeOption() {
+        return nbUeOption;
     }
 
-    public void setNombreOption(int nombreOption) {
-        this.nombreOption = nombreOption;
+    public void setnbUeOption(int nbUeOption) {
+        this.nbUeOption = nbUeOption;
     }
 
     public List<String> getGroupes() {
@@ -88,7 +84,7 @@ public class Formation {
     }
 
     public void addUe(Ue ue) {
-        if (this.ues.size() < this.nombreOption) {
+        if (this.ues.size() < this.nbUeOption) {
             this.ues.add(ue);
         } else {
             throw new IllegalArgumentException("The number of UEs cannot exceed the number of options.");

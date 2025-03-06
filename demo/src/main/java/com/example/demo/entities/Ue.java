@@ -13,6 +13,18 @@ public class Ue {
     // Liste des étudiants (doit être récupérée séparément)
     private List<Etudiant> etudiants = new ArrayList<>();
 
+    // Constructeur sans paramètre
+    public Ue() {}
+
+    // Constructeur avec paramètres
+    public Ue(Long id, String nom, boolean obligatoire, int capacite, Long formationId) {
+        this.id = id;
+        this.nom = nom;
+        this.obligatoire = obligatoire;
+        this.capacite = capacite;
+        this.formationId = formationId;
+    }
+
     // Getters et Setters
     public Long getId() {
         return id;

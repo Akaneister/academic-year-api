@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Map;
+import java.lang.annotation.Native;
 import java.util.HashMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -348,6 +349,106 @@ public ResponseEntity<String> deleteGroupe(@PathVariable Long id) {
     }
 
 }
+
+//________________________________________________________UE_____________________________________________________
+
+@GetMapping("/ue")
+public List<String> getUe() {
+    return databaseService.getUe();
+}
+
+@PostMapping("/ue")
+public ResponseEntity<String> createUe(@RequestBody Ue ue) {
+    try {
+        // Vérification des données reçues
+        if (ue.getNom() == null || ue.getNom().isEmpty()) {
+            return new ResponseEntity<>("Nom de l'UE est obligatoire", HttpStatus.BAD_REQUEST);
+        }
+        
+        if (ue.getCapacite() <= 0) {
+            return new ResponseEntity<>("Capacité doit être supérieure à 0", HttpStatus.BAD_REQUEST);
+        }
+
+        // Appel à un service pour enregistrer l'UE
+        boolean isCreated = databaseService.createUe(ue);
+
+        if (isCreated) {
+            return new ResponseEntity<>("UE créée avec succès", HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>("Erreur lors de la création de l'UE", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    } catch (Exception e) {
+        // Gestion des erreurs
+        return new ResponseEntity<>("Erreur serveur lors de la création de l'UE", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
+@GetMapping("/ue/{id}")
+public ResponseEntity<Ue> getUeById(@PathVariable Long id) {
+    try {
+        // Logique pour récupérer une UE par son id
+        Ue ue = databaseService.getUeById(id);  // Exemple, tu dois avoir cette méthode dans ton service
+        if (ue != null) {
+            return new ResponseEntity<>(ue, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    } catch (Exception e) {
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
+
+@PutMapping("/ue/{id}")
+public ResponseEntity<String> updateUe(@PathVariable Long id, @RequestBody Ue ue) {
+    try {
+        // Appel au service pour mettre à jour l'UE
+        boolean isUpdated = databaseService.updateUe(id, ue);
+        
+        if (isUpdated) {
+            return new ResponseEntity<>("UE mise à jour avec succès", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Erreur lors de la mise à jour de l'UE", HttpStatus.BAD_REQUEST);
+        }
+    } catch (Exception e) {
+        return new ResponseEntity<>("Erreur lors de la mise à jour de l'UE", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
+@DeleteMapping("/ue/{id}")
+public ResponseEntity<String> deleteUe(@PathVariable Long id) {
+    try {
+        // Appel au service pour supprimer l'UE
+        boolean isDeleted = databaseService.deleteUe(id);
+        
+        if (isDeleted) {
+            return new ResponseEntity<>("UE supprimée avec succès", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Erreur lors de la suppression de l'UE", HttpStatus.BAD_REQUEST);
+        }
+    } catch (Exception e) {
+        return new ResponseEntity<>("Erreur lors de la suppression de l'UE", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
+
+@PostMapping("ue/{id}/inscrire/{numeroEtudiant}")
+public ResponseEntity<String> inscrireEtudiantUe(@PathVariable Long id, @PathVariable String numeroEtudiant) {
+    try {
+        // Appel de la méthode pour inscrire l'étudiant à l'UE
+        databaseService.inscrireEtudiantUe(numeroEtudiant,id); 
+        
+        // Si aucune exception n'est lancée, l'inscription a réussi
+        logger.info("Student with number {} successfully enrolled in UE with ID: {}", numeroEtudiant, id);
+        return new ResponseEntity<>("Student enrolled successfully!", HttpStatus.OK);
+    } catch (Exception e) {
+        // Gestion des erreurs
+        logger.error("Failed to enroll student with number {} in UE with ID {}: {}", numeroEtudiant, id, e.getMessage());
+        return new ResponseEntity<>("Failed to enroll student.", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
+
 
 
 }

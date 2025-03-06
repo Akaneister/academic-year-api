@@ -215,7 +215,119 @@ public class DatabaseService {
         }
     }
 
+
 //__________________________________________________________________UE_____________________________
+
+
+public List<String> getUe() {
+    String sql = "SELECT DISTINCT nom FROM UE";
+    return jdbcTemplate.queryForList(sql, String.class);
+}
+
+public boolean createUe(Ue ue) {
+    // Requête SQL pour insérer une nouvelle unité d'enseignement (UE)
+    String sql = "INSERT INTO UE (nom, estObligatoire, capacite, formation_id) VALUES (?, ?, ?, ?)";
+
+    try {
+        // Mise à jour de la base de données avec les valeurs de l'objet Ue
+        int rowsAffected = jdbcTemplate.update(sql, 
+            ue.getNom(), // Le nom de l'UE
+            ue.isObligatoire(), // L'indicateur obligatoire (true/false)
+            ue.getCapacite(), // La capacité de l'UE
+            ue.getFormationId() // L'ID de la formation associée à l'UE
+        );
+        
+        // Si des lignes ont été affectées, l'insertion a réussi
+        return rowsAffected > 0;
+    } catch (Exception e) {
+        // En cas d'erreur, afficher l'exception et renvoyer false
+        System.out.println("Erreur lors de l'insertion de l'UE : " + e.getMessage());
+        return false;
+    }
+}
+
+public Ue getUeById(Long id) {
+    // Requête SQL pour récupérer une UE par son ID
+    String sql = "SELECT id, nom, estObligatoire, capacite, formation_id FROM UE WHERE id = ?";
+
+    try {
+        // Utilisation de jdbcTemplate pour interroger la base de données
+        return jdbcTemplate.queryForObject(
+            sql,
+            new Object[]{id},
+            (rs, rowNum) -> {
+                // Création d'un objet Ue à partir du résultat
+                Ue ue = new Ue();
+                ue.setId(rs.getLong("id"));
+                ue.setNom(rs.getString("nom"));
+                ue.setObligatoire(rs.getBoolean("estObligatoire"));
+                ue.setCapacite(rs.getInt("capacite"));
+                ue.setFormationId(rs.getLong("formation_id"));
+                return ue;
+            });
+    } catch (EmptyResultDataAccessException e) {
+        // Si aucun résultat n'est trouvé, on renvoie null
+        return null;
+    }
+}
+
+
+public boolean updateUe(Long id, Ue ue) {
+    // Requête SQL pour mettre à jour une UE
+    String sql = "UPDATE UE SET nom = ?, estObligatoire = ?, capacite = ?, formation_id = ? WHERE id = ?";
+
+    try {
+        // Mise à jour de la base de données avec les valeurs de l'objet Ue
+        int rowsAffected = jdbcTemplate.update(sql, 
+            ue.getNom(), // Le nom de l'UE
+            ue.isObligatoire(), // L'indicateur obligatoire (true/false)
+            ue.getCapacite(), // La capacité de l'UE
+            ue.getFormationId(), // L'ID de la formation associée à l'UE
+            id // L'ID de l'UE à mettre à jour
+        );
+        
+        // Si des lignes ont été affectées, la mise à jour a réussi
+        return rowsAffected > 0;
+    } catch (Exception e) {
+        // En cas d'erreur, afficher l'exception et renvoyer false
+        System.out.println("Erreur lors de la mise à jour de l'UE : " + e.getMessage());
+        return false;
+    }
+}
+
+public boolean deleteUe(Long id) {
+    // Requête SQL pour supprimer une UE par son ID
+    String sql = "DELETE FROM UE WHERE id = ?";
+
+    try {
+        // Suppression de l'UE dans la base de données
+        int rowsAffected = jdbcTemplate.update(sql, id);
+        
+        // Si des lignes ont été affectées, la suppression a réussi
+        return rowsAffected > 0;
+    } catch (Exception e) {
+        // En cas d'erreur, afficher l'exception et renvoyer false
+        System.out.println("Erreur lors de la suppression de l'UE : " + e.getMessage());
+        return false;
+    }
+}
+
+public void inscrireEtudiantUe(String numeroEtudiant, Long ueId) {
+    // Vérifier si l'UE existe
+    String ueSql = "SELECT id FROM UE WHERE id = ?";
+    try {
+        Long ueIdResult = jdbcTemplate.queryForObject(ueSql, Long.class, ueId);
+    } catch (EmptyResultDataAccessException e) {
+        throw new IllegalArgumentException("UE with ID " + ueId + " not found");
+    }
+
+    // Inscrire l'étudiant à l'UE
+    String insertSql = "INSERT INTO Etudiant_UE (numeroEtu, ue_id) VALUES (?, ?)";
+    jdbcTemplate.update(insertSql, numeroEtudiant, ueId);
+}
+
+
+
 }
 
 

@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.entities.Formation;
 import com.example.demo.service.DatabaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,9 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
-@RestController
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+@RestController
 public class HelloWorld {
+
+    private static final Logger logger = LoggerFactory.getLogger(HelloWorld.class);
 
     @Autowired
     private DatabaseService databaseService;
@@ -52,21 +57,23 @@ public class HelloWorld {
     }
 
 
+
     @PostMapping("/annees-academiques")
-    public ResponseEntity<String> createAcademicYear(@RequestBody String anneeAcademique) {
+    public ResponseEntity<String> addFormation(@RequestBody Formation formation) {
         try {
-            boolean exists = databaseService.checkIfAcademicYearExists(anneeAcademique);
-            if (exists) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Une année académique avec le même code existe déjà");
-            }
-            
-            databaseService.addAcademicYear(anneeAcademique);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Année académique créée avec succès");
-            
+            // Tentative d'ajout de la formation dans la base de données
+            databaseService.addFormation(formation);
+            logger.info("Formation added successfully: {}", formation.getNom()); // Log d'information
+            return new ResponseEntity<>("Formation added successfully!", HttpStatus.CREATED);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur serveur interne");
+            // Log d'erreur si l'ajout échoue
+            logger.error("Failed to add formation: {}", formation.getNom(), e);
+            return new ResponseEntity<>("Failed to add formation.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+   
+    
+
 
     
 }

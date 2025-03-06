@@ -10,17 +10,14 @@ import java.util.List;
  */
 public class Formation {
     private int tailleTP;
+    private int tailleTD;
     private String nom;
     private int nombreOption;
-    private int annee_Academic;
+    private String annee_Academic;
 
-    public int getAnnee_Academic() {
-        return annee_Academic;
-    }
+   
 
-    public void setAnnee_Academic(int annee_Academic) {
-        this.annee_Academic = annee_Academic;
-    }
+  
     private List<String> groupes;
     private List<Ue> ues;
 
@@ -35,6 +32,14 @@ public class Formation {
 
     public void setTailleTP(int tailleTP) {
         this.tailleTP = tailleTP;
+    }
+
+    public int getTailleTD() {
+        return tailleTD;
+    }
+
+    public void setTailleTD(int tailleTD) {
+        this.tailleTD = tailleTD;
     }
 
     public String getNom() {
@@ -85,4 +90,20 @@ public class Formation {
         }
     }
     
+    
+    public int getTailleTp() {
+        return tailleTP;
+    }
+
+    public void setTailleTp(int tailleTp) {
+        this.tailleTP = tailleTp;
+    }
+    
+    public String getAnneeAcademique() {
+        return annee_Academic;
+    }
+
+    public void setAnneeAcademique(String anneeAcademique) {
+        this.annee_Academic = anneeAcademique;
+    }
 }

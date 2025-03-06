@@ -1,13 +1,14 @@
 package com.example.demo.entities;
 
+import javax.persistence.Column;
+
 public class Etudiant {
     private String numeroEtudiant;
     private boolean validation;
     private String nom;
-    private String prenom;
     private int id;
-
-
+    
+    
     public int getId() {
         return id;
     }
@@ -17,32 +18,29 @@ public class Etudiant {
     }
 
 
-
+    @Column(name = "numeroEtu")
     public String getNom() {
         return nom;
     }
 
-    public String getPrenom() {
-        return prenom;
-    }
+    @Column(name = "compte_id")
     public void setNom(String nom) {
         this.nom = nom;
     }
 
-
+    @Column(name = "validation")
     public boolean getValidation() {
         return validation;
     }
     
 
-    public void setPrenom(String prenom) {
-        this.prenom = prenom;
-    }
 
+    @Column(name = "numeroEtu")
     public String getNumeroEtudiant() {
         return numeroEtudiant;
     }
 
+    @Column(name = "numeroEtu")
     public void setNumeroEtudiant(String numeroEtudiant) {
         this.numeroEtudiant = numeroEtudiant;
     }

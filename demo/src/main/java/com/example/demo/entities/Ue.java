@@ -1,14 +1,35 @@
 package com.example.demo.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Ue {
+    private Long id;
+    private String nom;
     private boolean obligatoire;
     private int capacite;
-    private String nom;
-    private List<Etudiant> etudiants; // List of Etudiant objects
+    private Long formationId; // Ajout de formation_id
 
-    // Getters and Setters
+    // Liste des étudiants (doit être récupérée séparément)
+    private List<Etudiant> etudiants = new ArrayList<>();
+
+    // Getters et Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
     public boolean isObligatoire() {
         return obligatoire;
     }
@@ -25,12 +46,12 @@ public class Ue {
         this.capacite = capacite;
     }
 
-    public String getNom() {
-        return nom;
+    public Long getFormationId() {
+        return formationId;
     }
 
-    public void setNom(String nom) {
-        this.nom = nom;
+    public void setFormationId(Long formationId) {
+        this.formationId = formationId;
     }
 
     public List<Etudiant> getEtudiants() {
@@ -41,8 +62,12 @@ public class Ue {
         this.etudiants = etudiants;
     }
 
-    // Method to add an Etudiant to the list
+    // Ajout sécurisé d'un étudiant
     public void addEtudiant(Etudiant etudiant) {
+        if (this.etudiants == null) {
+            this.etudiants = new ArrayList<>();
+        }
+
         if (this.etudiants.size() < this.capacite) {
             this.etudiants.add(etudiant);
         } else {

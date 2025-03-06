@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.entities.Etudiant;
 import com.example.demo.entities.Formation;
+import com.example.demo.entities.Ue;
 
 @Service
 public class DatabaseService {
@@ -70,9 +73,88 @@ public class DatabaseService {
         
         return rowsAffected > 0;
     }
+
+    public boolean deleteFormation(Long id) {
+        String sql = "DELETE FROM Formation WHERE id = ?";
+        int rowsAffected = jdbcTemplate.update(sql, id);
+        return rowsAffected > 0;
+    }
     
     
-    //__________________________________________________________________________
+    public List<Etudiant> getStudentsByFormationId(Long formationId) {
+        // Requête SQL pour obtenir les étudiants en fonction de leur formation
+        String sql = "SELECT numeroEtu AS numeroEtudiant, validation, compte_id AS nom, formation_id AS id FROM Etudiant WHERE formation_id = ?";
+        
+        // Utilisation de BeanPropertyRowMapper pour effectuer le mappage automatique
+        List<Etudiant> students = jdbcTemplate.query(
+            sql, 
+            new BeanPropertyRowMapper<>(Etudiant.class), 
+            formationId
+        );
+    
+        
+        return students;
+        }
+        
+        public List<String> getGroupesByFormationId(Long formationId) {
+            String sql = """
+                SELECT DISTINCT g.nom 
+                FROM Groupe g
+                JOIN Groupe_UE gu ON g.id = gu.groupe_id
+                JOIN UE u ON gu.ue_id = u.id
+                JOIN Formation f ON u.formation_id = f.id
+                WHERE f.id = ?;
+            """;
+        
+            return jdbcTemplate.queryForList(sql, String.class, formationId);
+        }
+
+        public List<Ue> getUesByFormationId(Long formationId) {
+            String sql = """
+                SELECT u.id, u.nom, u.estObligatoire, u.capacite 
+                FROM UE u
+                JOIN Formation f ON u.formation_id = f.id
+                WHERE f.id = ?;
+            """;
+        
+            return jdbcTemplate.query(sql, (rs, rowNum) -> {
+                Ue ue = new Ue();
+                ue.setId(rs.getLong("id"));
+                ue.setNom(rs.getString("nom"));
+                ue.setObligatoire(rs.getBoolean("estObligatoire"));
+                ue.setCapacite(rs.getInt("capacite"));
+                    return ue;
+                }, formationId);
+            }
+
+            public void inscrireEtudiant(String nomFormation, String numeroEtudiant) {
+                // Vérifier si la formation existe
+                String formationSql = "SELECT id FROM Formation WHERE nom = ?";
+                Long formationId = jdbcTemplate.queryForObject(formationSql, Long.class, nomFormation);
+            
+                if (formationId == null) {
+                    throw new IllegalArgumentException("Formation with name " + nomFormation + " not found");
+                }
+            
+                // Vérifier si l'étudiant existe déjà dans la formation
+                String etudiantSql = "SELECT COUNT(*) FROM Etudiant WHERE numeroEtu = ? AND formation_id = ?";
+                int count = jdbcTemplate.queryForObject(etudiantSql, Integer.class, numeroEtudiant, formationId);
+            
+                if (count > 0) {
+                    throw new IllegalStateException("Student with number " + numeroEtudiant + " is already enrolled in this formation");
+                }
+            
+                // Inscrire l'étudiant dans la base de données
+                String insertSql = "INSERT INTO Etudiant (numeroEtu, validation, formation_id) VALUES (?, 0, ?)";
+                jdbcTemplate.update(insertSql, numeroEtudiant, formationId);
+            }
+            
+    //__________________________________________________________________________Groupe__________________________
+
+    public List<String> getGroupes() {
+        String sql = "SELECT DISTINCT nom FROM Groupe";
+        return jdbcTemplate.queryForList(sql, String.class);
+    }
 }
 
 

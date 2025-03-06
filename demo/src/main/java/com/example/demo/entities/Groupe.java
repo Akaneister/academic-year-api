@@ -1,19 +1,29 @@
 package com.example.demo.entities;
 
-import java.util.List;
-
 
 public class Groupe {
-    private String gpType;
-    private String nom;
-    private List<Etudiant> etudiants;
+    private String type; // Correspond au champ 'type' dans la base de données
+    private String nom;  // Correspond au champ 'nom' dans la base de données
+    private long id;
+    
 
-    public String getGpType() {
-        return gpType;
+
+
+    public long getId(){
+        return id;
     }
 
-    public void setGpType(String gpType) {
-        this.gpType = gpType;
+    public void setId(long id){
+        this.id = id;
+    }
+
+    // Getters et Setters
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getNom() {
@@ -22,13 +32,5 @@ public class Groupe {
 
     public void setNom(String nom) {
         this.nom = nom;
-    }
-
-    public List<Etudiant> getEtudiants() {
-        return etudiants;
-    }
-
-    public void setEtudiants(List<Etudiant> etudiants) {
-        this.etudiants = etudiants;
     }
 }

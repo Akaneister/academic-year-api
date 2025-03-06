@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entities.Etudiant;
 import com.example.demo.entities.Formation;
+import com.example.demo.entities.Groupe;
 import com.example.demo.entities.Ue;
 
 @Service
@@ -155,6 +157,65 @@ public class DatabaseService {
         String sql = "SELECT DISTINCT nom FROM Groupe";
         return jdbcTemplate.queryForList(sql, String.class);
     }
+
+
+    public boolean createGroupe(Groupe groupe) {
+        String sql = "INSERT INTO Groupe (type, nom) VALUES (?, ?)"; // Utilise 'type' ici
+        try {
+            int rowsAffected = jdbcTemplate.update(sql, groupe.getType(), groupe.getNom()); // Utilise getType() ici
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+     public Groupe getGroupeById(Long id) {
+        String sql = "SELECT id, type, nom FROM Groupe WHERE id = ?";
+        
+        try {
+            // Utilisation de jdbcTemplate pour interroger la base de données
+            return jdbcTemplate.queryForObject(
+                sql,
+                new Object[]{id},
+                (rs, rowNum) -> {
+                    // Création d'un objet Groupe à partir du résultat
+                    Groupe groupe = new Groupe();
+                    groupe.setId(rs.getLong("id"));
+                    groupe.setType(rs.getString("type"));
+                    groupe.setNom(rs.getString("nom"));
+                    return groupe;
+                });
+        } catch (EmptyResultDataAccessException e) {
+            // Si aucun résultat n'est trouvé, on renvoie null
+            return null;
+        }
+    }
+
+    public boolean updateGroupe(Long id, Groupe groupe) {
+        String sql = "UPDATE Groupe SET type = ?, nom = ? WHERE id = ?";
+
+        try {
+            int rowsAffected = jdbcTemplate.update(sql, groupe.getType(), groupe.getNom(), id);
+            return rowsAffected > 0;  // Si une ligne a été mise à jour, alors la mise à jour a réussi
+        } catch (Exception e) {
+            // Gestion des erreurs
+            return false;
+        }
+    }
+
+    public boolean deleteGroupe(Long id) {
+        String sql = "DELETE FROM Groupe WHERE id = ?";
+
+        try {
+            int rowsAffected = jdbcTemplate.update(sql, id);
+            return rowsAffected > 0;  // Si une ligne a été supprimée, alors la suppression a réussi
+        } catch (Exception e) {
+            // Gestion des erreurs
+            return false;
+        }
+    }
+
+//__________________________________________________________________UE_____________________________
 }
 
 

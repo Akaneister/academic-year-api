@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.entities.Etudiant;
 import com.example.demo.entities.Formation;
+import com.example.demo.entities.Groupe;
 import com.example.demo.service.DatabaseService;
 import com.example.demo.entities.Ue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -278,6 +279,75 @@ public String getMethodName(@RequestParam String param) {
     return new String();
 }
 
+@PostMapping("/groupes")
+public ResponseEntity<String> createGroupe(@RequestBody Groupe groupe) {
+    try {
+        // Vérifier si le groupe est valide
+        if (groupe.getNom() == null || groupe.getType() == null) { // Utilise getType() ici
+            return new ResponseEntity<>("Invalid group data", HttpStatus.BAD_REQUEST);
+        }
+
+        // Appel au service/database pour enregistrer le groupe
+        boolean isCreated = databaseService.createGroupe(groupe);
+        
+        if (isCreated) {
+            return new ResponseEntity<>("Groupe created successfully", HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>("Failed to create group", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    } catch (Exception e) {
+        logger.error("Error creating group: {}", e.getMessage());
+        return new ResponseEntity<>("Error creating group", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
+@GetMapping("/groupes/{id}")
+public ResponseEntity<Groupe> getGroupeById(@PathVariable Long id) {
+    try {
+        // Logique pour récupérer un groupe par son id
+        Groupe groupe = databaseService.getGroupeById(id);  // Exemple, tu dois avoir cette méthode dans ton service
+        if (groupe != null) {
+            return new ResponseEntity<>(groupe, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    } catch (Exception e) {
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
+@PutMapping("/groupes/{id}")
+public ResponseEntity<String> updateGroupe(@PathVariable Long id, @RequestBody Groupe groupe) {
+    try {
+        // Appel au service pour mettre à jour le groupe
+        boolean isUpdated = databaseService.updateGroupe(id, groupe);
+        
+        if (isUpdated) {
+            return new ResponseEntity<>("Groupe updated successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Failed to update group", HttpStatus.BAD_REQUEST);
+        }
+    } catch (Exception e) {
+        return new ResponseEntity<>("Error while updating the group", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
+@DeleteMapping("/groupes/{id}")
+public ResponseEntity<String> deleteGroupe(@PathVariable Long id) {
+    try {
+        // Appel au service pour supprimer le groupe
+        boolean isDeleted = databaseService.deleteGroupe(id);
+        
+        if (isDeleted) {
+            return new ResponseEntity<>("Groupe deleted successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Failed to delete group", HttpStatus.BAD_REQUEST);
+        }
+    } catch (Exception e) {
+        return new ResponseEntity<>("Error while deleting the group", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+}
 
 
 }

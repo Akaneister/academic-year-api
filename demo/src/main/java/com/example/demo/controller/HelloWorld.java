@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -71,6 +72,24 @@ public class HelloWorld {
             return new ResponseEntity<>("Failed to add formation.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+    @GetMapping("annees-academiques/{id}")
+    public Map<String, Object> getFormationById(@PathVariable("id") int id) {
+        Formation formation = databaseService.getFormationById(id);
+    
+        Map<String, Object> response = new HashMap<>();
+        if (formation != null) {
+            response.put("formation", formation);
+        } else {
+            response.put("message", "Formation not found");
+        }
+    
+        return response;
+    }
+
+
+
    
     
 

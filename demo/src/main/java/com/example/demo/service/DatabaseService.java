@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -56,4 +57,13 @@ public class DatabaseService {
             formation.getAnneeAcademique());
     }
     
+    public Formation getFormationById(int id) {
+        String query = "SELECT * FROM Formation WHERE id = ?";
+        return jdbcTemplate.queryForObject(query, new Object[]{id}, new BeanPropertyRowMapper<>(Formation.class));
+    }
 }
+
+
+
+
+
